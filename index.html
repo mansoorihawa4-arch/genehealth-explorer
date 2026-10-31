@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeneHealth Explorer</title>
+<style>
+:root{--navy:#17324d;--teal:#167d83;--mint:#e8f5f2;--paper:#f6f8fb;--ink:#203040;--muted:#5d6b78}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(120deg,#17324d,#167d83);color:white;padding:30px 20px}
+.wrap{max-width:960px;margin:auto;padding:0 18px}header h1{margin:0;font-size:clamp(28px,5vw,42px)}header p{max-width:700px;margin:8px 0 0}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}nav a{color:white;border:1px solid #ffffff88;border-radius:20px;padding:7px 12px;text-decoration:none;font-size:14px}
+main{padding:22px 0 40px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:white;border:1px solid #dce5ec;border-radius:14px;padding:18px;box-shadow:0 3px 12px #17324d0b}
+h2{color:var(--navy);font-size:22px;margin:0 0 10px}h3{color:var(--teal);margin:0 0 8px}
+label{display:block;font-weight:bold;margin:12px 0 5px}input,select,button{font:inherit}input,select{width:100%;padding:10px;border:1px solid #b9c8d3;border-radius:8px;background:white}
+button{border:0;border-radius:8px;background:var(--teal);color:white;padding:10px 14px;cursor:pointer;margin-top:12px}button:hover{filter:brightness(.92)}
+.result{background:var(--mint);border-radius:8px;padding:12px;margin-top:12px;min-height:48px}
+.small{font-size:13px;color:var(--muted)}.pill{display:inline-block;background:var(--mint);color:#145b60;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:bold}
+footer{padding:18px 0;background:#eaf0f4;color:var(--muted);font-size:13px}
+ul{padding-left:20px}.notice{border-left:4px solid #d29b32;padding:10px 12px;background:#fff8e8;border-radius:5px}
+/* Punnett square */
+.punnett-wrap{margin-top:14px;display:none}
+.punnett{border-collapse:separate;border-spacing:6px;margin:8px 0}
+.punnett th{background:var(--navy);color:white;border-radius:8px;padding:10px 16px;min-width:64px;text-align:center}
+.punnett td{border-radius:8px;padding:18px 16px;min-width:84px;text-align:center;font-size:22px;font-weight:bold}
+.g-AA{background:#cfe9e4;color:#0f5a5f}.g-Aa{background:#fbe8b8;color:#7a5400}.g-aa{background:#f4cfd2;color:#8a2a35}
+.corner{background:transparent!important}
+.legend{display:flex;flex-wrap:wrap;gap:8px;font-size:13px;margin-top:6px}.legend span{border-radius:6px;padding:3px 8px;font-weight:bold}
+.example{background:#f2f6fa;border-radius:8px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<span class="pill">EDUCATIONAL PROJECT</span>
+<h1>GeneHealth Explorer</h1>
+<p>An interactive learning tool exploring inheritance, genes, and the relationship between genetics and human health.</p>
+<nav><a href="#learn">Learn genetics</a><a href="#calculator">Inheritance calculator</a><a href="#health">Genetics &amp; health</a><a href="#sources">Learning notes</a></nav>
+</div></header>
+<main class="wrap">
+<section class="grid" id="learn">
+<article class="card"><h2>What is a gene?</h2><p>A gene is a segment of DNA that contains instructions used by cells. Different versions of a gene are called <strong>alleles</strong>. Many human traits are influenced by multiple genes and environmental factors.</p></article>
+<article class="card"><h2>Chromosomes</h2><p>Chromosomes are structures made of DNA and proteins. Most human body cells have 23 pairs of chromosomes. Eggs and sperm usually carry one chromosome from each pair.</p></article>
+<article class="card"><h2>Inheritance</h2><p>Children inherit genetic information from both biological parents. A simple Punnett square can illustrate possible allele combinations for a single-gene model, but real inheritance can be more complex.</p></article>
+</section>
+<section class="card" id="calculator" style="margin-top:16px">
+<h2>Interactive inheritance model</h2>
+<p>This calculator demonstrates a simplified dominant/recessive model. It is a classroom example, not a prediction of a real person's health or appearance.</p>
+<div class="grid">
+<div><label for="parent1">Parent 1 allele pair</label><select id="parent1"><option value="AA">AA</option><option value="Aa" selected>Aa</option><option value="aa">aa</option></select></div>
+<div><label for="parent2">Parent 2 allele pair</label><select id="parent2"><option value="AA">AA</option><option value="Aa" selected>Aa</option><option value="aa">aa</option></select></div>
+</div>
+<button id="calculate">Calculate possible combinations</button>
+<div class="result" id="result" aria-live="polite">Choose allele pairs, then select calculate.</div>
+
+<div class="punnett-wrap" id="punnettWrap">
+<h3>Punnett square</h3>
+<p class="small">Each parent contributes one allele. The top row shows Parent 2's alleles and the left column shows Parent 1's. Each box is one equally likely combination.</p>
+<table class="punnett" id="punnett" aria-label="Punnett square of possible allele combinations"></table>
+<div class="legend"><span class="g-AA">AA</span><span class="g-Aa">Aa</span><span class="g-aa">aa</span></div>
+<p id="phenotype" class="small" style="margin-top:10px"></p>
+</div>
+</section>
+
+<section class="card" style="margin-top:16px" id="example">
+<h2>Worked example: Aa &times; Aa</h2>
+<p>Suppose both parents carry one dominant allele (A) and one recessive allele (a).</p>
+<div class="example">
+<ol>
+<li>Parent 1 can pass on <strong>A</strong> or <strong>a</strong>, each with a 1 in 2 chance.</li>
+<li>Parent 2 can also pass on <strong>A</strong> or <strong>a</strong>, each with a 1 in 2 chance.</li>
+<li>That gives 4 equally likely boxes: AA, Aa, Aa, aa.</li>
+<li>So the model gives AA 25%, Aa 50%, aa 25%. If A is dominant, 3 of 4 boxes (75%) show the dominant trait and 1 of 4 (25%) shows the recessive trait &mdash; a 3:1 ratio.</li>
+</ol>
+<p class="small">Try it above: select Aa and Aa, then press calculate to check the answer yourself. These are theoretical proportions for one simplified gene, not a prediction for any real family.</p>
+</div>
+</section>
+
+<section class="grid" style="margin-top:16px">
+<article class="card" id="health"><h2>Genetics and human health</h2><p>Some genetic variants can affect the chance of developing particular conditions. Other conditions involve many genes, lifestyle, and environmental influences. Genetic test results need qualified interpretation in their clinical context.</p><div class="notice"><strong>Important:</strong> This website is for general education only. It does not diagnose conditions, estimate personal risk, or replace a healthcare professional.</div></article>
+<article class="card" id="sources"><h2>Study questions</h2><ul><li>How are genes and chromosomes related?</li><li>Why can a simple inheritance model be useful for learning?</li><li>Why is real clinical genetics more complex than a classroom calculator?</li></ul><p class="small">For further study, consult reputable educational resources such as MedlinePlus Genetics and the National Human Genome Research Institute (NHGRI).</p></article>
+</section>
+</main>
+<footer><div class="wrap">GeneHealth Explorer · Student-built educational prototype · HTML, CSS and JavaScript</div></footer>
+<script>
+function gametes(pair){return pair.split("");}
+function genotype(a,b){return [a,b].sort().join("");}
+
+/* Build the 2x2 Punnett square as an HTML table */
+function renderPunnett(p1,p2){
+ const table=document.getElementById("punnett");
+ table.innerHTML="";
+ const head=table.insertRow();
+ const corner=document.createElement("th");
+ corner.className="corner";
+ head.appendChild(corner);
+ p2.forEach(b=>{
+  const th=document.createElement("th");
+  th.scope="col";
+  th.textContent=b;
+  head.appendChild(th);
+ });
+ p1.forEach(a=>{
+  const row=table.insertRow();
+  const th=document.createElement("th");
+  th.scope="row";
+  th.textContent=a;
+  row.appendChild(th);
+  p2.forEach(b=>{
+   const g=genotype(a,b);
+   const td=row.insertCell();
+   td.textContent=g;
+   td.className="g-"+g;
+  });
+ });
+ document.getElementById("punnettWrap").style.display="block";
+}
+
+document.getElementById("calculate").addEventListener("click",()=>{
+ const p1=gametes(document.getElementById("parent1").value);
+ const p2=gametes(document.getElementById("parent2").value);
+ const counts={};
+ p1.forEach(a=>p2.forEach(b=>{const g=genotype(a,b);counts[g]=(counts[g]||0)+1;}));
+ const total=p1.length*p2.length;
+ const detail=Object.entries(counts).map(([g,n])=>`${g}: ${n}/${total} (${Math.round(n/total*100)}%)`).join(" · ");
+ document.getElementById("result").textContent="Possible combinations in this simplified model: "+detail+". These are model proportions, not medical predictions.";
+
+ renderPunnett(p1,p2);
+
+ /* If A is dominant, AA and Aa show the dominant trait; only aa shows the recessive trait */
+ const recessive=counts["aa"]||0;
+ const dominant=total-recessive;
+ document.getElementById("phenotype").textContent=
+  `If A is dominant: ${dominant}/${total} boxes (${Math.round(dominant/total*100)}%) show the dominant trait and ${recessive}/${total} (${Math.round(recessive/total*100)}%) show the recessive trait. This is a simplified classroom model.`;
+});
+</script>
+</body></html>
